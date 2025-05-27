@@ -1,63 +1,36 @@
-
-import { useEffect, useState } from 'react'
-import Card from './components/Card.jsx'
-import './index.css'
-import Loader from './components/Loader.jsx';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./index.css";
+import Home from "./Pages/Home";
+import Product from "./Pages/Product"; // Assuming you have a Product component
+import Navbar from "./components/Navbar";
 
 function App() {
-  const [allProducts, setAllProducts] = useState([]);
-  const [skip, setSkip] = useState(0);
-  const [loader, setLoader] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // State to hold search query
+  const [filter, setFilter] = useState("");
 
-  useEffect(() => {
-    // (async () => {
-    //   // const products = await fetch('https://dummyjson.com/products').then(res => res.json());
-    //   // console.log(skip);
-    //   if (skip > 50) {
-    //     return;
-    //   }
-    //   setLoader(true);
-    //   const products = await fetch(`https://dummyjson.com/products?limit=10&skip=${skip}`).then(res => res.json());
-    //   setAllProducts((prev) => [...prev, products.products]);
-    //   setSkip((prev) => prev + 10);
-    //   setLoader(false);
-      
-    // })();
-  }, []);
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
 
-  async function fetchMore(){
-    
-      // setLoader(true);
-      const products = await fetch(`https://dummyjson.com/products?limit=10&skip=${skip}`).then(res => res.json());
-      setAllProducts((prev) => [...prev, products.products]);
-      setSkip((prev) => prev + 10);
-      setLoader(false);
-  }
-
-  // useEffect(() => {
-  //   console.log(prodCount);
-  // }, [prodCount]);
-
-  function func() {
-    fetchMore().then(()=>console.log("fetched"));
-  }
+  const handleFilter = (selectedFilter) => {
+    setFilter(selectedFilter);
+  };
 
   return (
     <>
-      <div className="card-container" onScroll={func}>
-        {allProducts.map((product,idx) => (
-          <Card
-            key={String(product.id)+"-"+ idx}
-            title={product.title}
-            description={product.description}
-            image={product.thumbnail}
-            price={product.price}
+      <Router>
+        <Navbar onSearch={handleSearch} onFilter={handleFilter} />
+        <Routes>
+          <Route
+            path="/"
+            element={<Home searchQuery={searchQuery} filter={filter} />}
           />
-        ))}
-        {loader && <Loader />}
-      </div>
+          <Route path="/product/:id" element={<Product />} />
+        </Routes>
+      </Router>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
