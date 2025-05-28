@@ -2,6 +2,13 @@ import { useEffect, useState, useCallback } from "react";
 import Card from "../components/Card.jsx";
 import Loader from "../components/Loader.jsx";
 import { useNavigate } from "react-router-dom";
+import PropTypes from 'prop-types'
+
+
+Home.propsType = {
+  searchQuery: PropTypes.string.isRequired,
+  filter:PropTypes.string.isRequired
+}
 
 function Home({ searchQuery, filter }) {
   const [allProducts, setAllProducts] = useState([]);
@@ -22,7 +29,7 @@ function Home({ searchQuery, filter }) {
       setHasMore(false);
     } else {
       setAllProducts((prev) => [...prev, ...response.products]);
-      setSkip((prev) => prev + 10);
+      setSkip((prev) => prev + 8);
     }
     setLoader(false);
   };
@@ -31,8 +38,8 @@ function Home({ searchQuery, filter }) {
     fetchMore();
   }, []);
 
+  // Filter and search
   useEffect(() => {
-    // Filter products based on the search query and filter
     let updatedProducts = [...allProducts];
 
     if (searchQuery) {
@@ -49,10 +56,6 @@ function Home({ searchQuery, filter }) {
       updatedProducts.sort((a, b) => a.price - b.price);
     } else if (filter === "price-high-low") {
       updatedProducts.sort((a, b) => b.price - a.price);
-    } else if (filter === "rating-high-low") {
-      updatedProducts.sort((a, b) => b.rating - a.rating);
-    } else if (filter === "rating-low-high") {
-      updatedProducts.sort((a, b) => a.rating - b.rating);
     }
 
     setFilteredProducts(updatedProducts);
@@ -76,14 +79,28 @@ function Home({ searchQuery, filter }) {
     navigate(`/product/${id}`);
   };
 
+  const updateThumbnail = () => {
+    
+  }
+
   return (
-    <div className="flex flex-col gap-4 mt-5 items-center md:flex-row md:flex-wrap md:justify-center md:items-start">
+    <div className="flex flex-col gap-4 mt-15 p-5 items-center md:flex-row md:flex-wrap md:justify-center md:items-start">
       {filteredProducts.map((product, idx) => (
         <div
           key={String(product.id) + "-" + idx}
           onClick={() => handleCardClick(product.id)}
           className="cursor-pointer"
         >
+          <div className="flex gap-3 mb-5 flex-row flex-wrap h-12 w-12">
+            {product.images.map((image, idx) => (
+              <img
+                key={idx}
+                src={image}
+                alt={`Product ${idx}`}
+                onClick={updateThumbnail}
+              />
+            ))}
+          </div>
           <Card
             title={product.title}
             description={product.description}

@@ -1,34 +1,34 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import Card from "../components/Card"; // Assuming you have a Card component for displaying products
+import Card from "../components/Card";
+import { Trash2 } from "lucide-react";
 
 function Product() {
-  const { id } = useParams(); // Get the product ID from the URL
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
-  const [reviews, setReviews] = useState([]); // Store reviews
+  const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
     name: "",
     rating: "",
     comment: "",
-  }); // Store new review input
-  const [relatedProducts, setRelatedProducts] = useState([]); // Store related products
-  const relatedProductsRef = useRef(null); // Reference for the related products container
+  });
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const relatedProductsRef = useRef(null);
 
   useEffect(() => {
-    // Fetch product details
     const fetchProduct = async () => {
       const response = await fetch(`https://dummyjson.com/products/${id}`).then(
         (res) => res.json()
       );
       setProduct(response);
-      setReviews(response.reviews || []); // Assuming reviews are part of the product API
+      setReviews(response.reviews || []);
     };
 
     fetchProduct();
   }, [id]);
 
   useEffect(() => {
-    // Fetch related products based on tags and category
+
     const fetchRelatedProducts = async () => {
       if (!product) return;
 
@@ -38,9 +38,9 @@ function Product() {
 
       const related = response.products.filter(
         (p) =>
-          p.id !== product.id && // Exclude the current product
-          (p.category === product.category || // Match category
-            p.tags.some((tag) => product.tags.includes(tag))) // Match tags
+          p.id !== product.id &&
+          (p.category === product.category ||
+            p.tags.some((tag) => product.tags.includes(tag)))
       );
 
       setRelatedProducts(related);
@@ -51,14 +51,14 @@ function Product() {
 
   const handleScrollLeft = () => {
     relatedProductsRef.current.scrollBy({
-      left: -300, // Scroll left by 300px
+      left: -300,
       behavior: "smooth",
     });
   };
 
   const handleScrollRight = () => {
     relatedProductsRef.current.scrollBy({
-      left: 300, // Scroll right by 300px
+      left: 300,
       behavior: "smooth",
     });
   };
@@ -71,15 +71,14 @@ function Product() {
         rating: parseInt(newReview.rating, 10),
         comment: newReview.comment,
         date: new Date().toISOString(),
-        reviewerEmail: "anonymous@example.com", // Default email
       };
-      setReviews((prev) => [...prev, newReviewObject]); // Add new review
-      setNewReview({ name: "", rating: "", comment: "" }); // Clear input fields
+      setReviews((prev) => [...prev, newReviewObject]);
+      setNewReview({ name: "", rating: "", comment: "" });
     }
   };
 
   const handleDeleteReview = (index) => {
-    setReviews((prev) => prev.filter((_, idx) => idx !== index)); // Remove review by index
+    setReviews((prev) => prev.filter((_, idx) => idx !== index));
   };
 
   if (!product) {
@@ -87,7 +86,7 @@ function Product() {
   }
 
   return (
-    <div className="p-5">
+    <div className="mt-10 p-5">
       <h1 className="text-3xl font-bold mb-5">{product.title}</h1>
       <img src={product.thumbnail} alt={product.title} className="w-72 mb-5" />
       <p className="text-gray-700 mb-3">{product.description}</p>
@@ -115,7 +114,7 @@ function Product() {
             >
               <div>
                 <p className="font-bold">
-                  {review.reviewerName} ({review.reviewerEmail})
+                  {review.reviewerName}
                 </p>
                 <p className="text-gray-700">{review.comment}</p>
                 <p className="text-sm text-gray-500">
@@ -127,9 +126,9 @@ function Product() {
               </div>
               <button
                 onClick={() => handleDeleteReview(idx)}
-                className="ml-3 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                className="ml-3  bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
               >
-                Delete
+                <Trash2 />
               </button>
             </li>
           ))}

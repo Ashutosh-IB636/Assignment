@@ -1,26 +1,60 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
+import { CloudCog, ShoppingCart } from 'lucide-react';
+import Button from "./Button";
 
 function Navbar({ onSearch, onFilter }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState(""); // State for filter
+  const [filter, setFilter] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
     e.preventDefault();
-    onSearch(searchQuery); // Pass the search query to the parent component
-    navigate("/"); // Redirect to the home page to display search results
+    onSearch(searchQuery);
+    navigate("/");
   };
 
   const handleFilterChange = (e) => {
     const selectedFilter = e.target.value;
     setFilter(selectedFilter);
-    onFilter(selectedFilter); // Pass the selected filter to the parent component
+    onFilter(selectedFilter);
   };
 
+  const handleSignIn = async () => {
+    try {
+      const res = await fetch('https://dummyjson.com/auth/login', {
+        method: 'POST',
+        headers: {
+          // 'Access-Control-Allow-Origin': 'dummyjson',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+
+          username: 'emilys',
+          password: 'emilyspass',
+          expiresInMins: 30, // optional, defaults to 60
+        }),
+        // credentials: 'include' // Include cookies (e.g., accessToken) in the request
+      })
+      if (res.status === 200) {
+        setAuthenticated(true);
+      }
+      const data = await res.json();
+      console.log(data);
+      return data
+    } catch (error) {
+      console.log("error: ", error)
+    }
+  }
+
+  const handleCart = () => {
+
+  }
+
   return (
-    <nav className="sticky top-0 bg-white z-50 border-b border-gray-300 px-5 py-2 flex justify-between items-center">
+    <nav className="fixed w-full top-0 bg-white z-50 border-b border-gray-300 px-5 py-2 flex justify-between items-center">
       <h1
         onClick={() => navigate("/")}
         className="text-xl font-bold text-gray-800 cursor-pointer"
@@ -50,9 +84,11 @@ function Navbar({ onSearch, onFilter }) {
         <option value="">Filter by</option>
         <option value="price-low-high">Price: Low to High</option>
         <option value="price-high-low">Price: High to Low</option>
-        <option value="rating-high-low">Rating: High to Low</option>
-        <option value="rating-low-high">Rating: Low to High</option>
       </select>
+
+      <div className="hover:cursor-pointer">
+        {authenticated ? <ShoppingCart onClick={handleCart} /> : <Button title={'Signin'} onclick={handleSignIn} />}
+      </div>
     </nav>
   );
 }
