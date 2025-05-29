@@ -1,17 +1,18 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
-import { CloudCog, ShoppingCart } from 'lucide-react';
+import { CloudCog, ShoppingCart } from "lucide-react";
 import Button from "./Button";
 import Cart from "./Cart";
 import { useUserContext } from "../contexts/useUserContext";
+import Signin from "./Signin";
 
 function Navbar({ onSearch, onFilter }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const { setUser } = useContext(useUserContext);
+  const { user } = useContext(useUserContext);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -25,36 +26,10 @@ function Navbar({ onSearch, onFilter }) {
     onFilter(selectedFilter);
   };
 
-  const handleSignIn = async () => {
-    try {
-      const res = await fetch('https://dummyjson.com/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-
-          username: 'emilys',
-          password: 'emilyspass',
-          expiresInMins: 30, // optional, defaults to 60
-        })
-      })
-      if (res.status === 200) {
-        setAuthenticated(true);
-      }
-      const data = await res.json();
-      setUser(data);
-      console.log(data);
-      return data
-    } catch (error) {
-      console.log("error: ", error)
-    }
-  }
-
   const handleCart = () => {
     console.log("Inside handlecart");
-    navigate('/cart');
-  }
+    navigate("/cart");
+  };
 
   return (
     <nav className="fixed w-full top-0 bg-white z-50 border-b border-gray-300 px-5 py-2 flex justify-between items-center">
@@ -90,7 +65,16 @@ function Navbar({ onSearch, onFilter }) {
       </select>
 
       <div className="hover:cursor-pointer">
-        {authenticated ? <ShoppingCart onClick={handleCart} /> : <Button title={'Signin'} onclick={handleSignIn} />}
+        {user ? (
+          <div>
+            <button onClick={() => setIsCartOpen(true)}>
+              <ShoppingCart onClick={handleCart} />
+            </button>
+            <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+          </div>
+        ) : (
+          <Signin />
+        )}
       </div>
     </nav>
   );

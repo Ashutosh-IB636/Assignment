@@ -2,10 +2,10 @@
 import "../index.css";
 import Rating from "./Rating";
 
-const Card = ({ title, description, thumbnail, images, price, rating }) => {
+const Card = ({ title, description, thumbnail, images, price, rating, onclick }) => {
 
   return (
-    <div className="max-w-2xs w-full flex-shrink-0 rounded-md overflow-hidden shadow-md cursor-pointer hover:shadow-2xl transition-shadow">
+    <div className="max-w-2xs w-full flex-shrink-0 rounded-md overflow-hidden shadow-md cursor-pointer hover:shadow-2xl transition-shadow" onClick={onclick}>
       {thumbnail && (
         <img className="w-full h-40 object-cover" src={thumbnail} alt={title} />
       )}
