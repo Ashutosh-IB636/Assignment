@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 import { CloudCog, ShoppingCart } from 'lucide-react';
 import Button from "./Button";
+import Cart from "./Cart";
+import { useUserContext } from "../contexts/useUserContext";
 
 function Navbar({ onSearch, onFilter }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useContext(useUserContext);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -27,7 +30,6 @@ function Navbar({ onSearch, onFilter }) {
       const res = await fetch('https://dummyjson.com/auth/login', {
         method: 'POST',
         headers: {
-          // 'Access-Control-Allow-Origin': 'dummyjson',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -35,13 +37,13 @@ function Navbar({ onSearch, onFilter }) {
           username: 'emilys',
           password: 'emilyspass',
           expiresInMins: 30, // optional, defaults to 60
-        }),
-        // credentials: 'include' // Include cookies (e.g., accessToken) in the request
+        })
       })
       if (res.status === 200) {
         setAuthenticated(true);
       }
       const data = await res.json();
+      setUser(data);
       console.log(data);
       return data
     } catch (error) {
@@ -50,7 +52,8 @@ function Navbar({ onSearch, onFilter }) {
   }
 
   const handleCart = () => {
-
+    console.log("Inside handlecart");
+    navigate('/cart');
   }
 
   return (

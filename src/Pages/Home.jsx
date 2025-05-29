@@ -2,13 +2,13 @@ import { useEffect, useState, useCallback } from "react";
 import Card from "../components/Card.jsx";
 import Loader from "../components/Loader.jsx";
 import { useNavigate } from "react-router-dom";
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 
 
-Home.propsType = {
-  searchQuery: PropTypes.string.isRequired,
-  filter:PropTypes.string.isRequired
-}
+// Home.propsType = {
+//   searchQuery: PropTypes.string.isRequired,
+//   filter:PropTypes.string.isRequired
+// }
 
 function Home({ searchQuery, filter }) {
   const [allProducts, setAllProducts] = useState([]);
@@ -79,9 +79,6 @@ function Home({ searchQuery, filter }) {
     navigate(`/product/${id}`);
   };
 
-  const updateThumbnail = () => {
-    
-  }
 
   return (
     <div className="flex flex-col gap-4 mt-15 p-5 items-center md:flex-row md:flex-wrap md:justify-center md:items-start">
@@ -91,22 +88,13 @@ function Home({ searchQuery, filter }) {
           onClick={() => handleCardClick(product.id)}
           className="cursor-pointer"
         >
-          <div className="flex gap-3 mb-5 flex-row flex-wrap h-12 w-12">
-            {product.images.map((image, idx) => (
-              <img
-                key={idx}
-                src={image}
-                alt={`Product ${idx}`}
-                onClick={updateThumbnail}
-              />
-            ))}
-          </div>
           <Card
             title={product.title}
             description={product.description}
             thumbnail={product.thumbnail}
             images={product.images}
             price={product.price}
+            rating={product.rating}
           />
         </div>
       ))}

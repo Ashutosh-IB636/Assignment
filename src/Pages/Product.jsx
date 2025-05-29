@@ -1,12 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
 import Card from "../components/Card";
 import { Trash2 } from "lucide-react";
+import Button from "../components/Button";
+import { useCartContext } from "../contexts/useCartContext";
+import { useUserContext } from "../contexts/useUserContext";
 
 function Product() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [thumbnail, setThumbnail] = useState('');
   const [newReview, setNewReview] = useState({
     name: "",
     rating: "",
@@ -14,6 +18,32 @@ function Product() {
   });
   const [relatedProducts, setRelatedProducts] = useState([]);
   const relatedProductsRef = useRef(null);
+  const [count, setCount] = useState(0);
+  const { cartProducts, setCartProducts } = useContext(useCartContext);
+  const { user } = useContext(useUserContext);
+
+
+  const incrementCount = () => {
+    setCount((prev) => {
+      return prev + 1 > 20 ? prev : prev + 1;
+    })
+  }
+
+  const decrementCount = () => {
+    setCount((prev) => {
+      return prev - 1 < 0 ? prev : prev - 1;
+    })
+  }
+
+  const handleAddToCart = (e) => {
+    if (count > 0) {
+      let addProduct = {
+        product: product,
+        quantity: count,
+      }
+      setCartProducts((prev) => [...prev, addProduct]);
+    }
+  }
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -22,6 +52,7 @@ function Product() {
       );
       setProduct(response);
       setReviews(response.reviews || []);
+      setThumbnail(response.thumbnail);
     };
 
     fetchProduct();
@@ -81,27 +112,38 @@ function Product() {
     setReviews((prev) => prev.filter((_, idx) => idx !== index));
   };
 
+
   if (!product) {
     return <p className="text-center text-gray-500">Loading...</p>;
   }
 
   return (
     <div className="mt-10 p-5">
-      <h1 className="text-3xl font-bold mb-5">{product.title}</h1>
-      <img src={product.thumbnail} alt={product.title} className="w-72 mb-5" />
-      <p className="text-gray-700 mb-3">{product.description}</p>
-      <p className="text-lg font-semibold mb-5">Price: ${product.price}</p>
+      <div className="flex justify-center flex-col">
+        <h1 className="text-3xl font-bold mb-5 self-center">{product.title}</h1>
+        <img src={thumbnail} alt={product.title} className="w-72 mb-3 self-center" />
+        <div className="flex gap-2 mb-5 self-center">
 
-      <h2 className="text-2xl font-semibold mb-3">Images</h2>
-      <div className="flex gap-3 mb-5">
-        {product.images.map((image, idx) => (
-          <img
-            key={idx}
-            src={image}
-            alt={`Product ${idx}`}
-            className="w-24 h-24 object-cover"
-          />
-        ))}
+          {product.images.map((image, idx) => (
+            <img
+              key={String(image) + "-" + idx}
+              src={image}
+              alt={`Product ${idx}`}
+              className="w-24 h-24 object-cover hover:cursor-pointer hover:h-26"
+              onClick={() => setThumbnail(image)}
+            />
+          ))}
+        </div>
+        <p className="text-gray-700 mb-3 self-center">{product.description}</p>
+        <p className="text-lg font-semibold mb-5 self-center">Price: ${product.price}</p>
+        <div className="flex justify-center">
+          <Button title={'Add to Cart'} onclick={handleAddToCart} />
+          <div className="flex flex-row" onClick={(e) => e.stopPropagation()}>
+            <div className="cursor-pointer h-auto m-3 bg-blue-300 text-gray-800 px-3 py-2 rounded-full hover:bg-gray-400" onClick={() => decrementCount()}>-</div>
+            <div className="pt-5">{count}</div>
+            <div className="cursor-pointer h-auto m-3 bg-blue-300 text-gray-800 px-3 py-2 rounded-full hover:bg-gray-400" onClick={() => incrementCount()}>+</div>
+          </div>
+        </div>
       </div>
 
       <h2 className="text-2xl font-semibold mb-3">Reviews</h2>
