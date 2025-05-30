@@ -7,7 +7,7 @@ const Rating = ({ rating }) => {
     return (
         <div>
             {Array.from({ length: totalStars }, (_, index) => {
-                if (index < Math.round(rating)) {
+                if (index < Math.floor(rating)) {
                     return <FontAwesomeIcon key={index} icon={faStar} color="gold" />;
                 } else if (index < rating) {
                     return <FontAwesomeIcon key={index} icon={faStarHalfAlt} color="gold" />;

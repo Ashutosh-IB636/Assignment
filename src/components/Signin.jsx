@@ -4,6 +4,9 @@ import { useUserContext } from '../contexts/useUserContext';
 const Signin = () => {
   const [showModal, setShowModal] = useState(false);
   const { setUser } = useContext(useUserContext);
+  const [userName, setUserName] = useState('');
+  const [userPassword, setuserPassword] = useState('');
+  const [accepted, setAccepted] = useState(false);
 
   const handleSignIn = async () => {
     try {
@@ -13,13 +16,15 @@ const Signin = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "emilys",
-          password: "emilyspass",
-          expiresInMins: 30, 
+          username: userName,
+          password: userPassword,
+          expiresInMins: 30,
         }),
       });
       const data = await res.json();
-      setUser(data);
+      if(res.status===200){
+        setUser(data);
+      }
       console.log(data);
       return data;
     } catch (error) {
@@ -47,8 +52,36 @@ const Signin = () => {
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50 flex flex-col">
+
           <div className="bg-white rounded-2xl shadow-xl w-11/12 max-w-md p-6">
+            <form className="space-y-6 bg-white" action="#" method="POST">
+              <div>
+                <label for="email" className="block text-sm font-medium text-gray-700">
+                  Username
+                </label>
+                <div class="mt-1">
+                  <input id="email" name="email" type="email" autocomplete="email" required
+                    className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    placeholder="emilys"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)} />
+                </div>
+              </div>
+
+              <div>
+                <label for="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div class="mt-1">
+                  <input id="password" name="password" type="password" autocomplete="current-password" required
+                    className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    placeholder="emilyspass"
+                    value={userPassword}
+                    onChange={(e) => setuserPassword(e.target.value)} />
+                </div>
+              </div>
+            </form>
             <h2 className="text-xl font-semibold mb-4 text-center">Terms & Conditions</h2>
             <p className="text-gray-700 text-sm mb-4">
               By clicking "Accept", you agree to the following:
@@ -58,16 +91,18 @@ const Signin = () => {
               <li>You agree to our privacy policy.</li>
               <li>You will not misuse the platform.</li>
             </ul>
-            <div className="flex justify-end gap-3">
+            <input type="checkbox" onClick={() => setAccepted(true)} className=''/>
+            <p className='text-gray-400 inline pl-2 hover:font-semibold'>I accept all the terms and conditions.</p>
+            <div className="flex justify-end gap-3 pt-4">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded-xl hover:bg-gray-400 transition"
+                className="px-4 py-2 bg-gray-300 rounded-xl hover:bg-red-400 transition"
               >
                 Decline
               </button>
               <button
                 onClick={handleAccept}
-                className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition"
+                className={`px-4 py-2 ${!accepted ? 'bg-gray-300' : 'bg-green-500 hover:cursor-pointer'} text-white rounded-xl transition`}
               >
                 Accept & Continue
               </button>

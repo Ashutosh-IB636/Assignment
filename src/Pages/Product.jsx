@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Card from "../components/Card";
-import { Pencil, Trash2 } from "lucide-react";
+import { CircleMinus, CirclePlus, Pencil, Trash2 } from "lucide-react";
 import Button from "../components/Button";
 import { useCartContext } from "../contexts/useCartContext";
 import { useUserContext } from "../contexts/useUserContext";
+import Rating from "../components/Rating";
 
 function Product() {
   const { id } = useParams();
@@ -20,7 +21,6 @@ function Product() {
   const relatedProductsRef = useRef(null);
   const [count, setCount] = useState(0);
   const { cartProducts, setCartProducts } = useContext(useCartContext);
-  const { user } = useContext(useUserContext);
   const navigate = useNavigate();
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -30,7 +30,7 @@ function Product() {
 
   const handleAddToCart = () => {
     if (count > 0) {
-      setCartProducts((prev) => [...prev, { product, quantity: count }]);
+      setCartProducts((prev) => [...prev, { productId: product.id, quantity: count }]);
     }
   };
 
@@ -105,7 +105,7 @@ function Product() {
     setEditingIndex(index);
 
     // Scroll smoothly to the form
-    formRef.current?.scrollIntoView({ behavior: "smooth" });
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
   const handleDeleteReview = (index) =>
@@ -153,16 +153,16 @@ function Product() {
             <div className="flex items-center gap-2">
               <button
                 onClick={decrementCount}
-                className="px-3 py-1 rounded-full bg-gray-200 text-lg hover:bg-gray-300"
+                className="px-3 py-1 rounded-full cursor-pointer"
               >
-                -
+                <CircleMinus />
               </button>
               <span className="text-xl">{count}</span>
               <button
                 onClick={incrementCount}
-                className="px-3 py-1 rounded-full bg-gray-200 text-lg hover:bg-gray-300"
+                className="px-3 py-1 rounded-full cursor-pointer"
               >
-                +
+                <CirclePlus />
               </button>
             </div>
           </div>
@@ -186,10 +186,8 @@ function Product() {
                     {new Date(review.date).toLocaleDateString()}
                   </p>
                 </div>
+                <Rating rating={review.rating} />
                 <div className="flex flex-col items-end">
-                  <span className="text-sm font-medium">
-                    Rating: {review.rating} / 5
-                  </span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEditReview(idx)}
@@ -253,11 +251,10 @@ function Product() {
             />
             <button
               type="submit"
-              className={`${
-                editingIndex !== null
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-blue-500 hover:bg-blue-600"
-              } text-white px-4 py-2 rounded-md`}
+              className={`${editingIndex !== null
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-blue-500 hover:bg-blue-600"
+                } text-white px-4 py-2 rounded-md`}
             >
               {editingIndex !== null ? "Update Review" : "Submit Review"}
             </button>

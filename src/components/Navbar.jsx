@@ -13,6 +13,7 @@ function Navbar({ onSearch, onFilter }) {
   const navigate = useNavigate();
   const { user } = useContext(useUserContext);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [displayCart, setDisplayCart] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -27,8 +28,7 @@ function Navbar({ onSearch, onFilter }) {
   };
 
   const handleCart = () => {
-    console.log("Inside handlecart");
-    navigate("/cart");
+    setDisplayCart(true);
   };
 
   return (
@@ -70,7 +70,7 @@ function Navbar({ onSearch, onFilter }) {
             <button onClick={() => setIsCartOpen(true)}>
               <ShoppingCart onClick={handleCart} />
             </button>
-            <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+            {displayCart && <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
           </div>
         ) : (
           <Signin />

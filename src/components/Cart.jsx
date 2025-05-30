@@ -6,21 +6,27 @@ const Cart = ({ isOpen, onClose }) => {
   const [total, setTotal] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
-    let sum = 0;
-    cartProducts.forEach((prod) => {
-      sum += prod.product.price * prod.quantity;
-    });
-    setTotal(sum);
-  }, [cartProducts]);
+    cartProducts.map((prod)=>{
+      fetch(`https://dummyjson.com/products/${prod.productId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        data.quantity = prod.quantity;
+        setAllProducts((prev)=>[...prev, data]);
+        setTotal((prev)=>prev+(data.price*data.quantity));
+      });
+    })
+  }, []);
 
   const handleCheckout = () => {
-    setIsCartOpen(false); // Close cart
+    setIsCartOpen(false); 
     setTimeout(() => {
-      setShowConfirmation(true); // Show confirmation after delay
-    }, 500); // Delay to allow cart close animation
-    setCartProducts([]); // Clear cart after checkout
+      setShowConfirmation(true);
+    }, 200);
+    setCartProducts([]);
+    setAllProducts([]);
   };
 
   return (
@@ -32,13 +38,11 @@ const Cart = ({ isOpen, onClose }) => {
         />
       )}
 
-      {/* Slide-in Cart Drawer */}
       <div
         className={`fixed top-0 right-0 h-full w-full max-w-lg bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl overflow-y-auto ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Close button */}
         <div className="flex justify-end p-4">
           <button
             className="text-3xl text-gray-400 hover:text-red-500 transition"
@@ -53,34 +57,32 @@ const Cart = ({ isOpen, onClose }) => {
           <h3 className="text-3xl font-extrabold mb-6 text-purple-800 text-center tracking-tight">
             Your Cart
           </h3>
-          {cartProducts.length > 0 ? (
+          {allProducts.length > 0 ? (
             <div className="space-y-6">
-              {cartProducts.map((prod, idx) => (
+              {allProducts.map((prod, idx) => (
                 <div
                   key={idx}
                   className="flex items-center gap-4 bg-gray-50 rounded-xl shadow-sm p-4 border hover:shadow-md transition"
                 >
                   <img
-                    src={prod.product.thumbnail}
+                    src={prod.thumbnail}
                     className="w-20 h-20 object-cover rounded-lg border"
-                    alt={prod.product.title}
+                    alt={prod.title}
                   />
                   <div className="flex-1">
                     <h4 className="text-lg font-semibold text-gray-800">
-                      {prod.product.title}
+                      {prod.title}
                     </h4>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-gray-500 text-xs">Qty:</span>
-                      <span className="bg-purple-700 text-white px-3 py-1 rounded-full text-sm font-bold">
-                        {prod.quantity}
-                      </span>
+                    <div className="flex  gap-2 mt-2 flex-col">
+                      <span className="text-gray-500 font-semibold">Price: {prod.price}</span>
+                      <span className="text-gray-500 text-xs">Qty: {prod.quantity}</span>
                     </div>
                   </div>
                   <div className="text-right">
+                      <span className="text-gray-500 font-semibold">${prod.price}X{prod.quantity}</span>
                     <span className="block text-xl font-bold text-purple-700">
-                      ${prod.product.price}
+                      ${`${prod.price}`*`${prod.quantity}`}
                     </span>
-                    <span className="block text-xs text-gray-400">each</span>
                   </div>
                 </div>
               ))}
@@ -104,7 +106,7 @@ const Cart = ({ isOpen, onClose }) => {
           <div className="mt-8 bg-purple-50 p-6 rounded-2xl shadow-inner">
             <div className="flex justify-between text-2xl font-bold mb-4 text-purple-900">
               <span>Total</span>
-              <span>${total}</span>
+              <span>${`${total.toFixed(1)}`}</span>
             </div>
             <button
               className="w-full bg-gradient-to-r from-purple-600 to-purple-800 text-white py-3 rounded-xl font-semibold text-lg shadow hover:from-purple-700 hover:to-purple-900 transition"
