@@ -1,31 +1,39 @@
 import { useContext, useEffect, useState } from "react";
-import { useCartContext } from "../contexts/useCartContext";
+import { useDispatch, useSelector } from "react-redux";
+import { removeFromCart, clearCart } from "../redux/cartSlice";
+import { Trash2 } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Cart = ({ isOpen, onClose }) => {
-  const { cartProducts, setCartProducts } = useContext(useCartContext);
+  const cartProducts = useSelector((state) => state.cart.cartProducts);
+  const dispatch = useDispatch();
   const [total, setTotal] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [allProducts, setAllProducts] = useState([]);
+  const navigate = useNavigate();
 
+  console.log("Inside Cart, product:", cartProducts);
   useEffect(() => {
-    cartProducts.map((prod)=>{
-      fetch(`https://dummyjson.com/products/${prod.productId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        data.quantity = prod.quantity;
-        setAllProducts((prev)=>[...prev, data]);
-        setTotal((prev)=>prev+(data.price*data.quantity));
-      });
-    })
-  }, []);
+    setAllProducts([]);
+    setTotal(0);
+    Object.entries(cartProducts).forEach(([productId, quantity]) => {
+      fetch(`https://dummyjson.com/products/${productId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          data.quantity = quantity;
+          setAllProducts((prev) => [...prev, data]);
+          setTotal((prev) => prev + data.price * data.quantity);
+        });
+    });
+  }, [cartProducts]);
 
   const handleCheckout = () => {
-    setIsCartOpen(false); 
+    setIsCartOpen(false);
     setTimeout(() => {
       setShowConfirmation(true);
     }, 200);
-    setCartProducts([]);
+    dispatch(clearCart());
     setAllProducts([]);
   };
 
@@ -63,6 +71,10 @@ const Cart = ({ isOpen, onClose }) => {
                 <div
                   key={idx}
                   className="flex items-center gap-4 bg-gray-50 rounded-xl shadow-sm p-4 border hover:shadow-md transition"
+                  onClick={() => {
+                    console.log("Clicked on product:", prod);
+                    navigate(`/product/${prod.id}`)
+                  }}
                 >
                   <img
                     src={prod.thumbnail}
@@ -74,15 +86,29 @@ const Cart = ({ isOpen, onClose }) => {
                       {prod.title}
                     </h4>
                     <div className="flex  gap-2 mt-2 flex-col">
-                      <span className="text-gray-500 font-semibold">Price: {prod.price}</span>
-                      <span className="text-gray-500 text-xs">Qty: {prod.quantity}</span>
+                      <span className="text-gray-500 font-semibold">
+                        Price: {prod.price}
+                      </span>
+                      <span className="text-gray-500 text-xs">
+                        Qty: {prod.quantity}
+                      </span>
                     </div>
                   </div>
                   <div className="text-right">
-                      <span className="text-gray-500 font-semibold">${prod.price}X{prod.quantity}</span>
-                    <span className="block text-xl font-bold text-purple-700">
-                      ${`${prod.price}`*`${prod.quantity}`}
+                    <span className="text-gray-500 font-semibold">
+                      ${prod.price}X{prod.quantity}
                     </span>
+                    <span className="block text-xl font-bold text-purple-700">
+                      ${`${prod.price}` * `${prod.quantity}`}
+                    </span>
+                    {/* Delete button */}
+                    <button
+                      className="p-2 ml-2 text-red-500 hover:text-red-700 text-lg"
+                      onClick={() => dispatch(removeFromCart(prod.id))}
+                      title="Remove from cart"
+                    >
+                      <Trash2 />
+                    </button>
                   </div>
                 </div>
               ))}

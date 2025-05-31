@@ -1,11 +1,13 @@
 import { useContext, useState } from 'react';
 import { useUserContext } from '../contexts/useUserContext';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/userSlice';
 
 const Signin = () => {
   const [showModal, setShowModal] = useState(false);
-  const { setUser } = useContext(useUserContext);
-  const [userName, setUserName] = useState('');
-  const [userPassword, setuserPassword] = useState('');
+  const dispatch = useDispatch();
+  const [userName, setUserName] = useState('emilys');
+  const [userPassword, setuserPassword] = useState('emilyspass');
   const [accepted, setAccepted] = useState(false);
 
   const handleSignIn = async () => {
@@ -23,7 +25,7 @@ const Signin = () => {
       });
       const data = await res.json();
       if(res.status===200){
-        setUser(data);
+        dispatch(setUser(data));
       }
       console.log(data);
       return data;

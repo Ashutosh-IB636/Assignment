@@ -6,6 +6,8 @@ import Button from "../components/Button";
 import { useCartContext } from "../contexts/useCartContext";
 import { useUserContext } from "../contexts/useUserContext";
 import Rating from "../components/Rating";
+import { useDispatch } from "react-redux";
+import {addToCart} from "../redux/cartSlice";
 
 function Product() {
   const { id } = useParams();
@@ -20,17 +22,16 @@ function Product() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const relatedProductsRef = useRef(null);
   const [count, setCount] = useState(0);
-  const { cartProducts, setCartProducts } = useContext(useCartContext);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [editingIndex, setEditingIndex] = useState(null);
 
-  const incrementCount = () =>
-    setCount((prev) => (prev < 20 ? prev + 1 : prev));
+  const incrementCount = () => setCount((prev) => (prev < 20 ? prev + 1 : prev));
   const decrementCount = () => setCount((prev) => (prev > 0 ? prev - 1 : prev));
 
   const handleAddToCart = () => {
     if (count > 0) {
-      setCartProducts((prev) => [...prev, { productId: product.id, quantity: count }]);
+      dispatch(addToCart({ id: product.id, quantity: count }));
     }
   };
 
@@ -117,9 +118,7 @@ function Product() {
 
   return (
     <div className="p-6 mt-15 mx-auto">
-      {/* Product Info */}
       <div className="flex flex-col md:flex-row gap-8 mb-10">
-        {/* Left: Image & Thumbnails */}
         <div className="flex flex-col items-center md:w-1/2">
           <img
             src={thumbnail}

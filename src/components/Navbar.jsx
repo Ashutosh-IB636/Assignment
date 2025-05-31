@@ -6,14 +6,19 @@ import Button from "./Button";
 import Cart from "./Cart";
 import { useUserContext } from "../contexts/useUserContext";
 import Signin from "./Signin";
+import { useSelector } from "react-redux";
 
 function Navbar({ onSearch, onFilter }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("");
   const navigate = useNavigate();
-  const { user } = useContext(useUserContext);
+  const user = useSelector(state => state.user.user);
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [displayCart, setDisplayCart] = useState(false);
+
+  // console.log("Inside Navbar, user:", user);
+  console.log("Inside Navbar, isAuthenticated:", isAuthenticated);
 
   const handleSearch = (e) => {
     e.preventDefault();
