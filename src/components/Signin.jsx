@@ -1,7 +1,7 @@
-import { useContext, useState } from 'react';
-import { useUserContext } from '../contexts/useUserContext';
+import { use, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/userSlice';
+import { setUser } from '../redux/slices/userSlice';
+import { userLogin } from '../api';
 
 const Signin = () => {
   const [showModal, setShowModal] = useState(false);
@@ -12,22 +12,10 @@ const Signin = () => {
 
   const handleSignIn = async () => {
     try {
-      const res = await fetch("https://dummyjson.com/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: userName,
-          password: userPassword,
-          expiresInMins: 30,
-        }),
-      });
-      const data = await res.json();
-      if(res.status===200){
+      const data = await userLogin(userName, userPassword);
+      if(data && data.accessToken) {
         dispatch(setUser(data));
       }
-      console.log(data);
       return data;
     } catch (error) {
       console.log("error: ", error);

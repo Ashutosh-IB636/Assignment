@@ -4,7 +4,6 @@ import "../index.css";
 import { CloudCog, ShoppingCart } from "lucide-react";
 import Button from "./Button";
 import Cart from "./Cart";
-import { useUserContext } from "../contexts/useUserContext";
 import Signin from "./Signin";
 import { useSelector } from "react-redux";
 
@@ -16,9 +15,6 @@ function Navbar({ onSearch, onFilter }) {
   const isAuthenticated = useSelector(state => state.user.isAuthenticated);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [displayCart, setDisplayCart] = useState(false);
-
-  // console.log("Inside Navbar, user:", user);
-  console.log("Inside Navbar, isAuthenticated:", isAuthenticated);
 
   const handleSearch = (e) => {
     e.preventDefault();

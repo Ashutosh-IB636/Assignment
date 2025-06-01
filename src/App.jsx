@@ -5,7 +5,6 @@ import Home from "./Pages/Home";
 import Product from "./Pages/Product"; // Assuming you have a Product component
 import Navbar from "./components/Navbar";
 import Cart from "./components/Cart";
-import { CartProvider } from "./contexts/useCartContext";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState(""); // State to hold search query
@@ -21,19 +20,17 @@ function App() {
 
   return (
     <>
-      <CartProvider>
-        <Router>
-          <Navbar onSearch={handleSearch} onFilter={handleFilter} />
-          <Routes>
-            <Route
-              path="/"
-              element={<Home searchQuery={searchQuery} filter={filter} />}
-            />
-            <Route path="/product/:id" element={<Product />} />
-            <Route path="/cart" element={<Cart />} />
-          </Routes>
-        </Router>
-      </CartProvider>
+      <Router>
+        <Navbar onSearch={handleSearch} onFilter={handleFilter} />
+        <Routes>
+          <Route
+            path="/"
+            element={<Home searchQuery={searchQuery} filter={filter} />}
+          />
+          <Route path="/product/:id" element={<Product />} />
+          <Route path="/cart" element={<Cart />} />
+        </Routes>
+      </Router>
     </>
   );
 }

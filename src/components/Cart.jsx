@@ -1,8 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { removeFromCart, clearCart } from "../redux/cartSlice";
+import { removeFromCart, clearCart } from "../redux/slices/cartSlice";
 import { Trash2 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { getProductById } from "../api";
 
 const Cart = ({ isOpen, onClose }) => {
   const cartProducts = useSelector((state) => state.cart.cartProducts);
@@ -13,18 +14,23 @@ const Cart = ({ isOpen, onClose }) => {
   const [allProducts, setAllProducts] = useState([]);
   const navigate = useNavigate();
 
-  console.log("Inside Cart, product:", cartProducts);
+  const fetchProduct = async (id) => {
+    try {
+      const data = await getProductById(id);
+      return data;
+    } catch (error) {
+      console.error("Error fetching product:", error);
+    }
+  };
+
   useEffect(() => {
     setAllProducts([]);
     setTotal(0);
-    Object.entries(cartProducts).forEach(([productId, quantity]) => {
-      fetch(`https://dummyjson.com/products/${productId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          data.quantity = quantity;
-          setAllProducts((prev) => [...prev, data]);
-          setTotal((prev) => prev + data.price * data.quantity);
-        });
+    Object.entries(cartProducts).forEach(async ([productId, quantity]) => {
+      const data = await fetchProduct(productId);
+      data.quantity = quantity;
+      setAllProducts((prev) => [...prev, data]);
+      setTotal((prev) => prev + data.price * data.quantity);
     });
   }, [cartProducts]);
 
@@ -73,7 +79,7 @@ const Cart = ({ isOpen, onClose }) => {
                   className="flex items-center gap-4 bg-gray-50 rounded-xl shadow-sm p-4 border hover:shadow-md transition"
                   onClick={() => {
                     console.log("Clicked on product:", prod);
-                    navigate(`/product/${prod.id}`)
+                    navigate(`/product/${prod.id}`);
                   }}
                 >
                   <img
@@ -104,7 +110,10 @@ const Cart = ({ isOpen, onClose }) => {
                     {/* Delete button */}
                     <button
                       className="p-2 ml-2 text-red-500 hover:text-red-700 text-lg"
-                      onClick={() => dispatch(removeFromCart(prod.id))}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(removeFromCart(prod.id));
+                      }}
                       title="Remove from cart"
                     >
                       <Trash2 />

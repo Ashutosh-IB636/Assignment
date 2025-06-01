@@ -3,11 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Card from "../components/Card";
 import { CircleMinus, CirclePlus, Pencil, Trash2 } from "lucide-react";
 import Button from "../components/Button";
-import { useCartContext } from "../contexts/useCartContext";
-import { useUserContext } from "../contexts/useUserContext";
 import Rating from "../components/Rating";
 import { useDispatch } from "react-redux";
-import {addToCart} from "../redux/cartSlice";
+import { addToCart } from "../redux/slices/cartSlice";
+import { getAllProducts, getProductById } from "../api.js"; // Assuming you have an API file for fetching products
 
 function Product() {
   const { id } = useParams();
@@ -26,7 +25,8 @@ function Product() {
   const navigate = useNavigate();
   const [editingIndex, setEditingIndex] = useState(null);
 
-  const incrementCount = () => setCount((prev) => (prev < 20 ? prev + 1 : prev));
+  const incrementCount = () =>
+    setCount((prev) => (prev < 20 ? prev + 1 : prev));
   const decrementCount = () => setCount((prev) => (prev > 0 ? prev - 1 : prev));
 
   const handleAddToCart = () => {
@@ -35,29 +35,43 @@ function Product() {
     }
   };
 
-  useEffect(() => {
-    fetch(`https://dummyjson.com/products/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
+  const fetchProduct = async () => {
+    try {
+      const data = await getProductById(id);
+      if (data) {
         setProduct(data);
-        setReviews(data.reviews || []);
         setThumbnail(data.thumbnail);
-      });
+        setReviews(data.reviews || []);
+      } else {
+        console.error("Product not found");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+    }
+  };
+
+  const fetchRelatedProducts = async () => {
+    try {
+      const data = await getAllProducts(0); // Fetch all products to find related ones
+      const related = data.products.filter(
+        (p) =>
+          p.id !== product.id &&
+          (p.category === product.category ||
+            p.tags?.some((tag) => product.tags?.includes(tag)))
+      );
+      setRelatedProducts(related);
+    } catch (error) {
+      console.error("Error fetching related products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProduct();
   }, [id]);
 
   useEffect(() => {
     if (!product) return;
-    fetch("https://dummyjson.com/products")
-      .then((res) => res.json())
-      .then((data) => {
-        const related = data.products.filter(
-          (p) =>
-            p.id !== product.id &&
-            (p.category === product.category ||
-              p.tags?.some((tag) => product.tags?.includes(tag)))
-        );
-        setRelatedProducts(related);
-      });
+    fetchRelatedProducts();
   }, [product]);
 
   const handleScroll = (dir) => {
@@ -178,7 +192,7 @@ function Product() {
                 key={idx}
                 className="bg-gray-100 p-4 rounded-lg shadow-sm flex justify-between items-start"
               >
-                <div>
+                <div className="flex-1">
                   <p className="font-semibold">{review.reviewerName}</p>
                   <p>{review.comment}</p>
                   <p className="text-sm text-gray-500">
@@ -186,11 +200,9 @@ function Product() {
                   </p>
                 </div>
                 <Rating rating={review.rating} />
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end flex-1">
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditReview(idx)}
-                    >
+                    <button onClick={() => handleEditReview(idx)}>
                       <Pencil />
                     </button>
                     <button
@@ -250,10 +262,11 @@ function Product() {
             />
             <button
               type="submit"
-              className={`${editingIndex !== null
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-blue-500 hover:bg-blue-600"
-                } text-white px-4 py-2 rounded-md`}
+              className={`${
+                editingIndex !== null
+                  ? "bg-green-500 hover:bg-green-600"
+                  : "bg-blue-500 hover:bg-blue-600"
+              } text-white px-4 py-2 rounded-md`}
             >
               {editingIndex !== null ? "Update Review" : "Submit Review"}
             </button>

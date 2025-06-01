@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import Card from "../components/Card.jsx";
 import Loader from "../components/Loader.jsx";
 import { useNavigate } from "react-router-dom";
+import {getAllProducts} from '../api.js'
 // import PropTypes from 'prop-types'
 
 
@@ -21,10 +22,7 @@ function Home({ searchQuery, filter }) {
   const fetchMore = async () => {
     if (loader || !hasMore) return;
     setLoader(true);
-    const response = await fetch(
-      `https://dummyjson.com/products?limit=10&skip=${skip}`
-    ).then((res) => res.json());
-
+    const response = await getAllProducts(skip);
     if (response.products.length === 0) {
       setHasMore(false);
     } else {
