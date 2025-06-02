@@ -1,8 +1,12 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
+
+const URL = "https://dummyjson.com";
 
 const userLogin = async (username, password) => {
   try {
-    const response = await fetch("https://dummyjson.com/auth/login", {
+    console.log(URL)
+    const response = await fetch(`${URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +30,7 @@ const userLogin = async (username, password) => {
 const getAllProducts = async (skip) => {
   try {
     const response = await fetch(
-      `https://dummyjson.com/products?limit=10&skip=${skip}`
+      `${URL}/products?limit=10&skip=${skip}`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch products");
@@ -40,7 +44,7 @@ const getAllProducts = async (skip) => {
 
 const getProductById = async (id) => {
   try {
-    const response = await fetch(`https://dummyjson.com/products/${id}`);
+    const response = await fetch(`${URL}/products/${id}`);
     if (!response.ok) {
       throw new Error("Failed to fetch product");
     }

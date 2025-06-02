@@ -2,6 +2,7 @@ import { use, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/slices/userSlice';
 import { userLogin } from '../api';
+import Button from './Button';
 
 const Signin = () => {
   const [showModal, setShowModal] = useState(false);
@@ -34,12 +35,13 @@ const Signin = () => {
 
   return (
     <div className='text-white font-semibold rounded-lg shadow-md hover:cursor-pointer'>
-      <button
+      {/* <button
         onClick={handleSignInClick}
         className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-400 transition"
       >
         Sign In
-      </button>
+      </button> */}
+      <Button title={'SignIn'} onclick={handleSignInClick}/>
 
       {showModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50 flex flex-col">
