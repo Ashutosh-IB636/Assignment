@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 import { ShoppingCart } from "lucide-react";
@@ -44,7 +44,7 @@ function Navbar({ onSearch, onFilter }) {
         onClick={() => navigate("/")}
         className="text-xl font-bold text-gray-800 cursor-pointer"
       >
-        My Store
+        MyMart
       </h1>
       <form onSubmit={handleSearch} className="flex items-center gap-2">
         <input
